@@ -35,8 +35,8 @@ fi
 if [ -n "$sysassert_model" ]
 then
     PROFILE_FILE="/etc/sysassert/profiles/${sysassert_model}.yaml"
-    tftp -g -l "$PROFILE_FILE" -r "sysassert/profiles/${sysassert_model}.yaml" "$tftp_server"
-    if [ ! -f "$PROFILE_FILE" ];
+    tftp -g -l "$PROFILE_FILE" -r "sysassert/profiles/${sysassert_model}.yaml" "$tftp_server" 2>/dev/null
+    if [ ! -f "$PROFILE_FILE" ]; then
         echo "sysassert profile not available"
         exit 1
     fi
