@@ -1,12 +1,19 @@
 #!/bin/sh
 
-VERBOSE=${INITRD_VERBOSE:-0}
+# Setting Environment
+
+export PATH="/sbin:/usr/sbin:/bin:/usr/bin"
+export HOSTNAME="bootmaker"
+
+hostname "$HOSTNAME"
+hostname >/etc/hostname
+echo "127.0.0.1 $HOSTNAME" >>/etc/hosts
 
 # Loading functions
 . /functions
 
+# Displaying infos
 [ -f /etc/banner ] && (echo; cat /etc/banner; echo) || echo "BootMaker"
-run hostname bootmaker
 esuccess "Image build: $(cat /.builddate)"
 esuccess "Kernel version: $(busybox uname -a)"
 if [ ! -d "/lib/modules/$(uname -r)" ]; then
@@ -75,15 +82,26 @@ for interface in $(ls -1 /sys/class/net); do
         ( echo "auto $interface" && echo "iface $interface inet dhcp" ) \
             >> /etc/network/interfaces
     fi
+    log_begin_msg "Configuring $interface"
+    run ifup "$interface"
+    log_end_msg
 done
-
-run ifup -a
 ip a | grep inet
 log_end_msg
 echo
 
+log_begin_msg "Starting Services"
+run-parts --exit-on-error /etc/rc.d
+log_end_msg
+
+log_begin_msg "Running sysassert"
+export SYSASSERT_PROFILE=$(get_opt sysassert_profile)
+if [ -n "$SYSASSERT_PROFILE" ]; then
+    /sysassert.sh
+fi
+
 log_success_msg "Dropping a shell"
 log_end_msg
 while true; do
-    (setsid cttyhack sh)
+    (setsid cttyhack sh -l)
 done

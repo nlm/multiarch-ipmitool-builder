@@ -125,7 +125,7 @@ cp "${output_dir}/boot/vmlinuz" "${BOOTMAKER_VMLINUZ}"
 
 einfo "Building initramfs"
 (cd "${output_dir}" && cat .exports .kexports | sort | cpio -o --format=newc) \
-    | gzip -9 > "${BOOTMAKER_INITRAMFS}"
+    | gzip > "${BOOTMAKER_INITRAMFS}"
 
 einfo "Removing temporary files"
 rm -fr "${output_dir}"

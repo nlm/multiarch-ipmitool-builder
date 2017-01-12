@@ -16,14 +16,31 @@ RUN apk update \
         wget \
         usbutils \
         util-linux \
+        dmidecode \
     && find /var/cache/apk -type f -delete
+
+# Remove busybox version of lspci
+RUN rm -f /usr/bin/lspci
 
 # Update PCI ids
 RUN update-pciids
 
+RUN apk update \
+    && apk add \
+        git \
+        python3 \
+    && find /var/cache/apk -type f -delete
+
+RUN pip3 install --upgrade pip \
+    && pip install git+https://github.com/nlm/sysassert
+
 # Installing init and direct dependencies
 COPY assets/init/init assets/init/functions /
 COPY assets/etc/ /etc/
+
+RUN ln -fs /etc/udhcpc/default.script /usr/share/udhcpc/default.script
+COPY assets/init/sysassert.sh /
+RUN mkdir -p /etc/sysassert/profiles
 
 # Adding build date
 RUN date -u +%Y%m%d-%H%M%S > /.builddate
