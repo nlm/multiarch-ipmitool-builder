@@ -94,11 +94,14 @@ log_begin_msg "Starting Services"
 run-parts --exit-on-error /etc/rc.d
 log_end_msg
 
-log_begin_msg "Running sysassert"
 export SYSASSERT_PROFILE=$(get_opt sysassert_profile)
 if [ -n "$SYSASSERT_PROFILE" ]; then
-    /sysassert.sh
+    log_begin_msg "Running sysassert"
+    sh /sysassert.sh
+else
+    log_warning_msg "No sysassert profile in cmdline, skipping"
 fi
+log_end_msg
 
 log_success_msg "Dropping a shell"
 log_end_msg

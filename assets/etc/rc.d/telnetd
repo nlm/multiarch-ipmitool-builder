@@ -1,2 +1,2 @@
 #!/bin/sh
-telnetd -l /bin/bash
+telnetd -l /bin/sh
