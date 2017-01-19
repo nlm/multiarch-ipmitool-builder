@@ -17,6 +17,7 @@ RUN apk update \
         usbutils \
         util-linux \
         dmidecode \
+        xz \
     && find /var/cache/apk -type f -delete
 
 # Remove busybox version of lspci
@@ -53,10 +54,13 @@ RUN find . -xdev \
   > .exports
 
 ## Installing Kernel
-ARG KERNEL_IMAGE=https://github.com/nlm/docker-kextract/releases/download/jessie/vmlinuz-%%DEB_ARCH%%
-ARG KERNEL_MODULES=https://github.com/nlm/docker-kextract/releases/download/jessie/modules-%%DEB_ARCH%%.tar.gz
-ADD $KERNEL_IMAGE /boot/vmlinuz
-ADD $KERNEL_MODULES /lib/modules/
+#ARG KERNEL_IMAGE=https://github.com/nlm/docker-kextract/releases/download/jessie/vmlinuz-%%DEB_ARCH%%
+#ARG KERNEL_MODULES=https://github.com/nlm/docker-kextract/releases/download/jessie/modules-%%DEB_ARCH%%.tar.gz
+#ADD $KERNEL_IMAGE /boot/vmlinuz
+#ADD $KERNEL_MODULES /lib/modules/
+ADD cache/vmlinuz-%%DI_DIST%%-%%DEB_ARCH%% /boot/vmlinuz
+ADD cache/modules-*-%%DI_DIST%%-%%DEB_ARCH%%.tar.xz /lib/modules/
+RUN depmod -a $(ls /lib/modules | head -n 1)
 
 #RUN apk update \
 #    && apk add linux-vanilla \

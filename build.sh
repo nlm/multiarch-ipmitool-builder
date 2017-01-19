@@ -16,16 +16,19 @@ case "${ARCH}" in
         CROSS_TRIPLE="x86_64-linux-gnu"
         ALPINE_VERSION="latest-stable"
         DEB_ARCH="amd64"
+        DI_DIST="xenial"
         ;;
     aarch64)
         CROSS_TRIPLE="aarch64-linux-gnu"
         ALPINE_VERSION="latest-stable"
         DEB_ARCH="arm64"
+        DI_DIST="xenial"
         ;;
     armhf)
         CROSS_TRIPLE="arm-linux-gnueabihf"
         ALPINE_VERSION="latest-stable"
         DEB_ARCH="armhf"
+        DI_DIST="xenial"
         ;;
     *)
         eerror "Architecture not supported: ${ARCH}"
@@ -40,6 +43,7 @@ cat Dockerfile.template \
           -e "s/%%CROSS_TRIPLE%%/${CROSS_TRIPLE}/g" \
           -e "s/%%ALPINE_VERSION%%/${ALPINE_VERSION}/g" \
           -e "s/%%DEB_ARCH%%/${DEB_ARCH}/g" \
+          -e "s/%%DI_DIST%%/${DI_DIST}/g" \
     > Dockerfile."${ARCH}"
 
 einfo "Creating build dir"
