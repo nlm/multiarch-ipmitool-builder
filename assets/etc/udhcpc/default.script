@@ -6,15 +6,20 @@ RUN_DIR="/run/dhcp"
 
 case $1 in
     bound|renew)
-    if [ -n "$ip" -a -n "$subnet" -a -n "$interface" ]
-    then
+        # Configure ip address
+        if [ -n "$ip" -a -n "$subnet" -a -n "$interface" ]
+        then
             ip addr add $ip/$subnet dev $interface
-    fi
+        fi
 
-        if [ -n "$router" -a -n "$(ip route | grep -a default)" ]
-    then
-            echo "$0: Resetting default routes"
-            ip route delete default
+        # Setup default route
+        if [ -n "$router" ]
+        then
+            if [ -n "$(ip route | grep -a default)" ]
+            then
+                echo "resetting default route"
+                ip route delete default
+            fi
 
             metric=0
             for i in $router; do
@@ -49,10 +54,11 @@ case $1 in
         if [ -x /sbin/resolvconf ]; then
             resolvconf -d "${interface}.udhcpc"
         fi
-    if [ -n "$ip" -a -n "$subnet" -a -n "$interface" ]
-    then
-        ip addr delete $ip/$subnet dev $interface
-    fi
+
+        if [ -n "$ip" -a -n "$subnet" -a -n "$interface" ]
+        then
+            ip addr delete $ip/$subnet dev $interface
+        fi
         ;;
 
     leasefail)
