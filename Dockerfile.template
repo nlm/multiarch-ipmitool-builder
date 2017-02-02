@@ -30,6 +30,9 @@ RUN apk update \
     && apk add \
         git \
         python3 \
+        dmidecode \
+        dpkg \
+        tar \
     && find /var/cache/apk -type f -delete
 
 RUN pip3 install --upgrade pip \
@@ -42,6 +45,8 @@ COPY assets/etc/ /etc/
 RUN ln -fs /etc/udhcpc/default.script /usr/share/udhcpc/default.script
 COPY assets/init/sysassert.sh /
 RUN mkdir -p /etc/sysassert/profiles
+
+#######################################################################
 
 # Adding build date
 RUN date -u +%Y%m%d-%H%M%S > /.builddate
@@ -69,3 +74,10 @@ RUN depmod -a $(ls /lib/modules | head -n 1)
 
 # Finding installed kernel version
 RUN ls -1 /lib/modules > /.kversion
+
+# Supplementary tools
+
+#RUN apk update && apk add automake autoconf build-base file libtool
+#ADD build-ipmitool /
+#RUN chmod +x build-ipmitool && ./build-ipmitool
+#RUN find ./usr/bin/ipmitool >> .exports

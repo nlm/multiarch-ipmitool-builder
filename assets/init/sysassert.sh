@@ -42,4 +42,5 @@ then
     fi
     sysassert validate "$PROFILE_FILE" || true
     sysassert validate "$PROFILE_FILE" >"/run/httpd/result.txt" 2>&1 || true
+    logger -i -p daemon.info --tag "$(hostname)" -f "/run/httpd/result.txt"
 fi

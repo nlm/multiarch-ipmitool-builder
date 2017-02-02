@@ -5,9 +5,8 @@
 export PATH="/sbin:/usr/sbin:/bin:/usr/bin"
 export HOSTNAME="bootmaker"
 
-hostname "$HOSTNAME"
-hostname >/etc/hostname
-echo "127.0.0.1 $HOSTNAME" >>/etc/hosts
+#hostname "$HOSTNAME"
+#hostname >/etc/hostname
 
 # Loading functions
 . /functions
@@ -57,11 +56,21 @@ echo
 
 # Detect Hardware
 log_begin_msg "Detecting hardware..."
-udevd --daemon
-udevadm trigger
-udevadm settle
+run udevd --daemon
+run udevadm trigger
+run udevadm settle
 log_end_msg
 echo
+
+log_begin_msg "Updating hostname..."
+SYSPN="$(dmidecode -s system-product-name | tr 'A-Z ' 'a-z-')"
+SYSMF="$(dmidecode -s system-manufacturer | tr 'A-Z ' 'a-z-')"
+SYSSN="$(dmidecode -s system-serial-number | tr 'A-Z ' 'a-z-')"
+export HOSTNAME="${SYSMF}-${SYSPN}-${SYSSN}"
+hostname "$HOSTNAME"
+hostname >/etc/hostname
+echo "127.0.0.1 $HOSTNAME" >>/etc/hosts
+log_end_msg
 
 log_begin_msg "Retrieving system info"
 esuccess "Kernel cmdline:    $(cat /proc/cmdline)"
