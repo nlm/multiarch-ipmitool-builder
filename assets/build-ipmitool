@@ -1,0 +1,12 @@
+#!/bin/sh -eu
+
+IPMITOOL_SOURCE="http://http.debian.net/debian/pool/main/i/ipmitool/ipmitool_1.8.18.orig.tar.bz2"
+BUILDDIR=$(mktemp -d)
+DESTDIR="${1:-/workdir}"
+cd $BUILDDIR
+wget $IPMITOOL_SOURCE -q -O - | tar jxf -
+cd ipmitool-*
+./bootstrap
+./configure --prefix=/usr
+make -j 8
+make install

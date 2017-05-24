@@ -1,83 +1,17 @@
 FROM multiarch/alpine:%%ARCH%%-%%ALPINE_VERSION%%
 
-# Installing static busybox
-ARG BUSYBOX_STATIC=https://github.com/nlm/busybox-static-multiarch/releases/download/prerelease-1.25.1/busybox-%%CROSS_TRIPLE%%
-ADD $BUSYBOX_STATIC /bin/busybox.static
-RUN chmod 755 /bin/busybox.static \
-    && mv /bin/busybox.static /bin/busybox
-RUN /bin/busybox --install -s
-
 # Installing core packages
 RUN apk update \
     && apk add \
-        udev \
-        bkeymaps \
-        pciutils \
         wget \
-        usbutils \
-        util-linux \
-        dmidecode \
-        xz \
+        automake \
+        autoconf \
+        build-base \
+        file \
+        libtool \
     && find /var/cache/apk -type f -delete
 
-# Remove busybox version of lspci
-RUN rm -f /usr/bin/lspci
-
-# Update PCI ids
-RUN update-pciids
-
-RUN apk update \
-    && apk add \
-        git \
-        python3 \
-        dmidecode \
-        dpkg \
-        tar \
-    && find /var/cache/apk -type f -delete
-
-RUN pip3 install --upgrade pip \
-    && pip install git+https://github.com/nlm/sysassert
-
-# Installing init and direct dependencies
-COPY assets/init/init assets/init/functions /
-COPY assets/etc/ /etc/
-
-RUN ln -fs /etc/udhcpc/default.script /usr/share/udhcpc/default.script
-COPY assets/init/sysassert.sh /
-RUN mkdir -p /etc/sysassert/profiles
-
-#######################################################################
-
-# Adding build date
-RUN date -u +%Y%m%d-%H%M%S > /.builddate
-
-# Listing the files to export
-RUN find . -xdev \
-           -not -name .dockerenv \
-           -not -name .exports \
-           -not -name qemu-%%ARCH%%-static \
-  > .exports
-
-## Installing Kernel
-#ARG KERNEL_IMAGE=https://github.com/nlm/docker-kextract/releases/download/jessie/vmlinuz-%%DEB_ARCH%%
-#ARG KERNEL_MODULES=https://github.com/nlm/docker-kextract/releases/download/jessie/modules-%%DEB_ARCH%%.tar.gz
-#ADD $KERNEL_IMAGE /boot/vmlinuz
-#ADD $KERNEL_MODULES /lib/modules/
-ADD cache/vmlinuz-%%DI_DIST%%-%%DEB_ARCH%% /boot/vmlinuz
-ADD cache/modules-*-%%DI_DIST%%-%%DEB_ARCH%%.tar.xz /lib/modules/
-RUN depmod -a $(ls /lib/modules | head -n 1)
-
-#RUN apk update \
-#    && apk add linux-vanilla \
-#    && find /var/cache/apk -type f -delete
-#
-
-# Finding installed kernel version
-RUN ls -1 /lib/modules > /.kversion
-
-# Supplementary tools
-
-#RUN apk update && apk add automake autoconf build-base file libtool
-#ADD build-ipmitool /
-#RUN chmod +x build-ipmitool && ./build-ipmitool
-#RUN find ./usr/bin/ipmitool >> .exports
+ADD assets/build-ipmitool /
+RUN /build-ipmitool
+RUN mkdir -p /workdir
+CMD cp /usr/bin/ipmitool /workdir
