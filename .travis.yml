@@ -18,3 +18,7 @@ deploy:
   file: bla
   on:
     repo: nlm/multiarch-ipmitool-builder
+    tags: on
+  skip_cleanup: true
+  file_glob: true
+  file: "./dist/*"
