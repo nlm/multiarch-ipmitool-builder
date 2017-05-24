@@ -2,6 +2,7 @@
 ARCH="${BOOTMAKER_ARCH:-$(uname -m)}"
 DOCKERIMAGE="${BOOTMAKER_DOCKERIMAGE:-ipmitool_builder}"
 WORKDIR="${BOOTMAKER_WORKDIR:-.}"
+DI_DIST="${BOOTMAKER_DIDIST:-xenial}"
 
 . "assets/functions"
 
@@ -12,19 +13,16 @@ case "${ARCH}" in
         CROSS_TRIPLE="x86_64-linux-gnu"
         ALPINE_VERSION="latest-stable"
         DEB_ARCH="amd64"
-        DI_DIST="xenial"
         ;;
     aarch64)
         CROSS_TRIPLE="aarch64-linux-gnu"
         ALPINE_VERSION="v3.5"
         DEB_ARCH="arm64"
-        DI_DIST="xenial"
         ;;
     armhf)
         CROSS_TRIPLE="arm-linux-gnueabihf"
         ALPINE_VERSION="latest-stable"
         DEB_ARCH="armhf"
-        DI_DIST="xenial"
         ;;
     *)
         eerror "Architecture not supported: ${ARCH}"
@@ -45,6 +43,8 @@ cat Dockerfile.template \
 einfo "Creating build dir"
 output_dir="${WORKDIR}/ipmitool-${ARCH}"
 [ -d "${output_dir}" ] || mkdir "${output_dir}"
+dist_dir="${WORKDIR}/dist"
+[ -d "${dist_dir}" ] || mkdir "${dist_dir}"
 
 einfo "Building container"
 BUILD_ARGS=""
@@ -58,5 +58,8 @@ container_id=$(docker run --rm -v "$(pwd)/${output_dir}:/workdir" "${DOCKERIMAGE
 
 einfo "Removing temporary files"
 rm -f "Dockerfile.${ARCH}"
+
+einfo "Moving file to dist dir"
+mv "${output_dir}/ipmitool" "${dist_dir}/ipmitool-${ARCH}"
 
 einfo "Finished"

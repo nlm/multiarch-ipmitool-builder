@@ -1,0 +1,23 @@
+sudo: required
+services:
+- docker
+language: bash
+install:
+- mkdir dist
+script:
+- "./travis.sh"
+before_deploy:
+- sudo chmod 755 ./dist
+- sudo chmod 644 ./dist/*
+- sudo chown -R travis:travis ./dist
+- ls -al ./dist/
+deploy:
+  provider: releases
+  api_key:
+    secure: o2iYvVMJrHgkwsOk4kCA085q2gJWTpOoLw8PKlXikqIfYhelj26x04GT0vxDJtmB0YtbgNQh2WP+Le2sCzuR6fecA2VZqSJArFvoPAw+gOmKD9HFZ5YR+DoZxR24kXlP/06hcEnmMe0gg3/uWFWDXzCDaukbf+PNCxXp67uMIkPR6SG2fXtUVmhQA6qRrsCoS3ibWXgd3rowO9HDMRp7Qt0yV/cQfOfVi4uYNJ+hTR2YTENvvjcTJTexfs/l0KzcIvcDuXUFAmclHWuBujEEpkDbdh4TKJbO5Wcw6mpNZpG919vCABQIBZftIy6POCgH3yUgl2300HOGc9laKLHfABjw3egQ4egJrKCRLdJbyvxOU9EcAh+u1xk1293HfiTKwiIdeCoeca/2k2yf3vnbO231MDGIaM18zHci3FiuofHMuUhWBQ55RLznL8cfSHPabwQdVDrn9sqxu0p5aYPQIh3sQ9VGqjndUbbqk4FHH049FanOnw3TRmuuenffjEza83Ji/AIOG/PXAHELkrXr7+j2QnC+XJ2vHjkkkj+J2vgjr10rY2nIwVrlvXsN1rcshedMmYVRnGc6qBF+gpQ2FjiWsRM5Y/HK09lSd3lr722/cVx/hxw+vM387douRfpC6/OPTTJuyRMo0lEnrKTQbpOCAjA7Z5lUHy1eop0DXpw=
+  on:
+    repo: nlm/bootmaker
+    tags: on
+  skip_cleanup: true
+  file_glob: true
+  file: "./dist/*"
