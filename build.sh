@@ -3,7 +3,7 @@ ARCH="${BOOTMAKER_ARCH:-$(uname -m)}"
 DOCKERIMAGE="${BOOTMAKER_DOCKERIMAGE:-ipmitool_builder}"
 WORKDIR="${BOOTMAKER_WORKDIR:-.}"
 
-. "assets/init/functions"
+. "assets/functions"
 
 einfo "Starting Image Builder"
 
