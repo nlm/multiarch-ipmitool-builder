@@ -1,5 +1,0 @@
-#!/bin/sh
-HTTPROOT=/run/httpd
-
-mkdir -p "$HTTPROOT"
-httpd -h "$HTTPROOT"
